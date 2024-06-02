@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        barBackground:"#B4C292",
-        barButtonBackground:"#3B3923"
+        barBackground:"#94B9FF",
+        barButtonBackground:"#000000"
 
       },
     },

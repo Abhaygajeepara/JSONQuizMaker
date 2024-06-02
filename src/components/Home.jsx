@@ -14,7 +14,7 @@ const Home = ({ setIsHide }) => {
     dispatch(setIsHide(!isHide));
   };
 
-  console.log(isHide);
+  
 
   return (
     <>

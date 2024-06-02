@@ -11,7 +11,12 @@ const Question = () => {
     const [submitted, setSubmitted] = useState(false); 
 
     useEffect(() => {
+        questionsJSON()
+    }, [jsonInput]);
+
+    const questionsJSON =  () => {
         if (jsonInput) {
+            setSubmitted(false);
             try {
                 const parsedJson = JSON.parse(jsonInput);
                 if (parsedJson.quiz) {
@@ -31,7 +36,7 @@ const Question = () => {
                 toast.error('Invalid JSON input');
             }
         }
-    }, [jsonInput]);
+    }
 
     const handleOptionChange = (questionIndex, optionIndex) => {
         const updatedQuestions = [...questions];
@@ -41,16 +46,24 @@ const Question = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (questions.every(question => question.userAnswer !== '')) {
-            // All questions are answered
-            const newScore = calculateScore();
-            setScore(newScore);
-            toast.success(`Your score: ${newScore}/${questions.length}`);
-            setSubmitted(true); // Set submitted to true after successful submission
+        if (submitted) {
+            handleReset();
         } else {
-            // Not all questions are answered
-            toast.error('Please answer all questions.');
+            if (questions.every(question => question.userAnswer !== '')) {
+                // All questions are answered
+                const newScore = calculateScore();
+                setScore(newScore);
+                toast.success(`Your score: ${newScore}/${questions.length}`);
+                setSubmitted(true); // Set submitted to true after successful submission
+            } else {
+                // Not all questions are answered
+                toast.error('Please answer all questions.');
+            }
         }
+    };
+
+    const handleReset = () => {
+        questionsJSON();
     };
 
     const calculateScore = () => {
@@ -69,7 +82,7 @@ const Question = () => {
                 {isLoaded && (
                     questions.map((question, questionIndex) => (
                         <div key={questionIndex} className="p-4">
-                            <h1 className="text-2xl font-bold">{questionIndex+1}. {question.question}</h1>
+                            <h1 className="text-2xl font-bold">{questionIndex + 1}. {question.question}</h1>
                             <ul>
                                 {question.options.map((option, optionIndex) => (
                                     <li key={optionIndex} className="text-lg">
@@ -93,16 +106,15 @@ const Question = () => {
                     ))
                 )}
             </div>
-            <div className="grid grid-cols-2 justify-end items-center bg-barBackground p-2 ">
+            <div className="grid grid-cols-2 justify-end items-center bg-barBackground p-2">
                 <h1 className="text-2xl font-bold">
-                   {!submitted ? `Attempted Questions: ${attemptedQuestions}/ ${questions.length}` : `Score: ${score} / ${questions.length}`}
+                    {!submitted ? `Attempted Questions: ${attemptedQuestions}/ ${questions.length}` : `Score: ${score} / ${questions.length}`}
                 </h1>
                 <button 
                     type="submit" 
                     className="bg-barButtonBackground text-white p-2 rounded"
-                    disabled={submitted} // Disable submit button if form is submitted
                 >
-                    {submitted ? 'Submitted' : 'Submit'}
+                    {submitted ? 'Reset' : 'Submit'}
                 </button>
             </div>
         </form>

@@ -27,9 +27,14 @@ const UserInput = ({ jsonInput, setJsonInput, setIsHide }) => {
     };
     return (
         <div className='h-screen flex flex-col'>
-            <div className="flex justify-end items-end bg-barBackground p-2 ">
+            <div className="flex justify-between bg-barBackground p-2 ">
+                <div>
+                <button  className="bg-barButtonBackground text-white p-2 rounded" >Watch Tutorial</button>
+                </div>
+            <div>
             <button  className="bg-barButtonBackground text-white p-2 rounded" onClick={handleCopyFormat}>Copy JSON format</button>
             <button className="bg-barButtonBackground text-white p-2 ml-1 rounded" onClick={handleIsHide}>Hide Input</button>
+            </div>
             </div>
             <div className="flex-1">
                 <textarea 

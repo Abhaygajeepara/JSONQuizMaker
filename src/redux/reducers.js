@@ -10,7 +10,7 @@ const initialState = {
         }
     ]
 }`,
-isHide: true,
+isHide: false,
 };
 
 const rootReducer = (state = initialState, action) => {
