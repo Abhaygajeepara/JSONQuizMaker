@@ -1,124 +1,66 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
+import { connect, useSelector } from 'react-redux';
+import { setJsonInput, setIsHide } from '../redux/actions.js';
+import PropTypes from 'prop-types';
 
-const Question = () => {
-    const [isLoaded, setIsLoaded] = useState(false);
-    const jsonInput = useSelector(state => state.jsonInput); 
-    const [questions, setQuestions] = useState([]);
-    const [score, setScore] = useState(0);
-    const [attemptedQuestions, setAttemptedQuestions] = useState(0);
-    const [submitted, setSubmitted] = useState(false); 
-
-    useEffect(() => {
-        questionsJSON()
-    }, [jsonInput]);
-
-    const questionsJSON =  () => {
-        if (jsonInput) {
-            setSubmitted(false);
-            try {
-                const parsedJson = JSON.parse(jsonInput);
-                if (parsedJson.quiz) {
-                    // Map over the quiz array and create QuestionModel objects
-                    const formattedQuestions = parsedJson.quiz.map(q => ({
-                        question: q.question,
-                        options: q.options,
-                        answer: q.answer,
-                        userAnswer: '' // Set initial userAnswer as an empty string
-                    }));
-                    setQuestions(formattedQuestions); // Update state with formatted questions
-                    setIsLoaded(true);
-                } else {
-                    setIsLoaded(false);
-                }
-            } catch (error) {
-                toast.error('Invalid JSON input');
-            }
-        }
-    }
-
-    const handleOptionChange = (questionIndex, optionIndex) => {
-        const updatedQuestions = [...questions];
-        updatedQuestions[questionIndex].userAnswer = questions[questionIndex].options[optionIndex];
-        setQuestions(updatedQuestions);
+const UserInput = ({ jsonInput, setJsonInput, setIsHide }) => {
+    const isHides = useSelector(state => state.isHide);
+    const handleChange = (e) => {
+        setJsonInput(e.target.value);
     };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (submitted) {
-            handleReset();
-        } else {
-            if (questions.every(question => question.userAnswer !== '')) {
-                // All questions are answered
-                const newScore = calculateScore();
-                setScore(newScore);
-                toast.success(`Your score: ${newScore}/${questions.length}`);
-                setSubmitted(true); // Set submitted to true after successful submission
-            } else {
-                // Not all questions are answered
-                toast.error('Please answer all questions.');
-            }
-        }
+    const handleIsHide = () => {
+        setIsHide(!isHides);
     };
-
-    const handleReset = () => {
-        questionsJSON();
+    
+    const handleCopyFormat = () => {
+        navigator.clipboard.writeText(jsonInput)
+            .then(() => {
+                console.log('JSON format copied to clipboard');
+                // Optionally, you can provide feedback to the user
+                alert('JSON format copied to clipboard');
+            })
+            .catch((error) => {
+                console.error('Failed to copy JSON format: ', error);
+                // Optionally, you can provide feedback to the user
+                alert('Failed to copy JSON format');
+            });
     };
-
-    const calculateScore = () => {
-        return questions.reduce((totalScore, question) => {
-            return totalScore + (question.userAnswer === question.answer ? 1 : 0);
-        }, 0);
-    };
-
-    useEffect(() => {
-        setAttemptedQuestions(questions.filter(question => question.userAnswer !== '').length);
-    }, [questions]);
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white h-screen flex flex-col">
-            <div className="flex-1 overflow-auto">
-                {isLoaded && (
-                    questions.map((question, questionIndex) => (
-                        <div key={questionIndex} className="p-4">
-                            <h1 className="text-2xl font-bold">{questionIndex + 1}. {question.question}</h1>
-                            <ul>
-                                {question.options.map((option, optionIndex) => (
-                                    <li key={optionIndex} className="text-lg">
-                                        <label>
-                                            <input 
-                                                type="radio" 
-                                                name={`question${questionIndex}`} 
-                                                value={optionIndex} 
-                                                onChange={() => handleOptionChange(questionIndex, optionIndex)}
-                                                checked={question.userAnswer === question.options[optionIndex]}
-                                                required // Make the radio buttons required
-                                                className='mr-2'
-                                                disabled={submitted} // Disable input if form is submitted
-                                            />
-                                           {option}
-                                        </label>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))
-                )}
+        <div className='h-screen flex flex-col'>
+            <div className="bg-barBackground p-2 flex flex-col sm:flex-row justify-between">
+                <div className="mb-2 sm:mb-0">
+                    <button className="bg-barButtonBackground text-white p-2 rounded">Watch Tutorial</button>
+                </div>
+                <div>
+                    <button className="bg-barButtonBackground text-white p-2 rounded mb-1 sm:mb-0" onClick={handleCopyFormat}>Copy JSON format</button>
+                    <button className="bg-barButtonBackground text-white p-2 rounded" onClick={handleIsHide}>Hide Input</button>
+                </div>
             </div>
-            <div className="grid grid-cols-2 justify-end items-center bg-barBackground p-2">
-                <h1 className="text-2xl font-bold">
-                    {!submitted ? `Attempted Questions: ${attemptedQuestions}/ ${questions.length}` : `Score: ${score} / ${questions.length}`}
-                </h1>
-                <button 
-                    type="submit" 
-                    className="bg-barButtonBackground text-white p-2 rounded"
-                >
-                    {submitted ? 'Reset' : 'Submit'}
-                </button>
+            <div className="flex-1">
+                <textarea 
+                    className="w-full h-full p-4 text-lg md:text-2xl resize-none border-rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500"
+                    placeholder="Enter JSON text here"
+                    value={jsonInput}
+                    onChange={handleChange}
+                ></textarea>
             </div>
-        </form>
+        </div>
     );
-}
+};
 
-export default Question;
+UserInput.propTypes = {
+    jsonInput: PropTypes.string.isRequired,
+    setJsonInput: PropTypes.func.isRequired,
+    setIsHide: PropTypes.func.isRequired,   
+};
+
+const mapStateToProps = (state) => ({
+    jsonInput: state.jsonInput,
+});
+
+const mapDispatchToProps = {
+    setJsonInput,
+    setIsHide
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserInput);

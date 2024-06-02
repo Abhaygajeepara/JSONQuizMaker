@@ -1,4 +1,3 @@
-
 import { connect, useSelector, useDispatch } from 'react-redux';
 import Question from "./Question";
 import UserInput from "./UserInput";
@@ -14,25 +13,23 @@ const Home = ({ setIsHide }) => {
     dispatch(setIsHide(!isHide));
   };
 
-  
-
   return (
     <>
-      <div className="bg-gray-200 overflow-auto grid grid-cols-2 gap-4">
+      <div className="bg-gray-200 overflow-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
         {isHide ? (
-          <div className="col-span-2">
+          <div className="col-span-1 sm:col-span-2 relative">
             <Question />
             <button
-          className="absolute top-0 right-0 m-2 p-2 bg-barButtonBackground text-white rounded-full"
-          onClick={handleIsHide}
-        >
-          <FaExpand />
-        </button>
+              className="absolute top-0 right-0 m-2 p-2 bg-barButtonBackground text-white rounded-full"
+              onClick={handleIsHide}
+            >
+              <FaExpand />
+            </button>
           </div>
         ) : (
           <>
-            <Question className="col-span-2" />
-            <UserInput />
+            <Question className="col-span-1 sm:col-span-2" />
+            <UserInput className="col-span-1 sm:col-span-2" />
           </>
         )}
       </div>
