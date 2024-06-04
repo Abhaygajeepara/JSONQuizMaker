@@ -11,7 +11,13 @@ const UserInput = ({ jsonInput, setJsonInput, setIsHide }) => {
        
         setIsHide(!isHides);
     };
-    
+    const tutorialURL = "https://github.com/Abhaygajeepara/QuizMaster/assets/56512543/fc9edfba-07b5-48e1-b96a-260c8bb01972";
+
+
+    const redirectToTutorial = () => {
+        // Redirect user to the tutorial link
+        window.location.href = tutorialURL;
+    }; 
     const handleCopyFormat = () => {
         navigator.clipboard.writeText(jsonInput)
             .then(() => {
@@ -29,7 +35,7 @@ const UserInput = ({ jsonInput, setJsonInput, setIsHide }) => {
         <div className='h-screen flex flex-col'>
             <div className="flex justify-between bg-barBackground p-2 ">
                 <div>
-                <button  className="bg-barButtonBackground text-white p-2 rounded" >Watch Tutorial</button>
+                <button  className="bg-barButtonBackground text-white p-2 rounded" onClick={redirectToTutorial} >Watch Tutorial</button>
                 </div>
             <div>
             <button  className="bg-barButtonBackground text-white p-2 rounded" onClick={handleCopyFormat}>Copy JSON format</button>
